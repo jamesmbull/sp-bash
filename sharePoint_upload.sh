@@ -7,6 +7,8 @@
 # Step by step SP REST auth reference here:
 # http://paulryan.com.au/2014/spo-remote-authentication-rest/
 #
+# Relevant MS REST documentation
+# https://dev.office.com/sharepoint/docs/sp-add-ins/working-with-folders-and-files-with-rest
 
 SITENAME="${2}"
 
@@ -44,9 +46,12 @@ done < rdigest
 
 # Upload file
 
+# You might have to clean up file names
+FILENAME=$(echo $1 | sed 's|.*\/||')
+
 curl -b cookies \
      -H "X-RequestDigest: ${DIGEST}" \
      -H "Accept: application/json;odata=verbose" \
      -H "Content-Type: multipart/form-data" \
      -T "${1}" \
-     -X POST "https://[ you ].sharepoint.com/sites/${SITENAME}/_api/web/lists/getbytitle('${3}')/rootfolder/files/add(url='${1}',overwrite=true)"
+     -X POST "https://[ you ].sharepoint.com/sites/${SITENAME}/_api/web/GetFolderByServerRelativeUrl('${3}')/files/add(url='${FILENAME}',overwrite=true)"
