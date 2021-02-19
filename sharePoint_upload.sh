@@ -25,7 +25,7 @@ curl -X POST -d @auth.xml https://login.microsoftonline.com/extSTS.srf -o rstoke
 
 # Parse secure token response (rstoken)
 while read_dom; do
-    if [[ $ENTITY = "wsse:BinarySecurityToken Id=\"Compact0\"" ]] ; then
+    if [[ $ENTITY = "wsse:BinarySecurityToken Id=\"Compact0\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"" ]] ; then
         echo $CONTENT > stoken
     fi
 done < rstoken
@@ -51,7 +51,8 @@ FILENAME=$(echo $1 | sed 's|.*\/||')
 
 curl -b cookies \
      -H "X-RequestDigest: ${DIGEST}" \
+     -H "Authorization: Bearer + ${stoken}" \
      -H "Accept: application/json;odata=verbose" \
      -H "Content-Type: multipart/form-data" \
      -T "${1}" \
-     -X POST "https://[ you ].sharepoint.com/sites/${SITENAME}/_api/web/GetFolderByServerRelativeUrl('${3}')/files/add(url='${FILENAME}',overwrite=true)"
+     -X POST "https://[ you ].sharepoint.com/sites/${SITENAME}/_api/web/GetFolderByServerRelativeUrl('${3}')/Files/add(url='${FILENAME}',overwrite=true)"
